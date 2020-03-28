@@ -1,10 +1,13 @@
-from urllib.parse import urlencode
-from urllib.request import urlopen
-import time
-import json
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
 import codecs
 import datetime
+import json
+import time
 from collections import OrderedDict
+from urllib.parse import urlencode
+from urllib.request import urlopen
 
 reader = codecs.getreader("utf-8")
 
@@ -23,13 +26,11 @@ count = 1000
 # Size in MB, if your files are less than 1 MB, set to 0
 size = 0
 
-#What size to check: greater, smaller
+# What size to check: greater, smaller
 delimiter = 'greater'
 
-# Types?
+# Types: all, spaces, snippets, images, gdocs, zips, pdfs
 types = 'all'
-# types = 'spaces,snippets,images,gdocs,zips,pdfs'
-# types = 'zips'
 
 
 def list_files():
@@ -56,7 +57,7 @@ def filter_by_size(files, mb, greater_or_smaller):
 def info(file):
     order = ['Title', 'Name', 'Created', 'Size', 'Filetype',
              'Comment', 'Permalink', 'Download', 'User', 'Channels']
-    info = {
+    data = {
         'Title': file['title'],
         'Name': file['name'],
         'Created': datetime.datetime.utcfromtimestamp(file['created']).strftime('%B %d, %Y %H:%M:%S'),
@@ -68,16 +69,16 @@ def info(file):
         'User': file['user'],
         'Channels': file['channels']
     }
-    return OrderedDict((key, info[key]) for key in order)
+    return OrderedDict((key, data[key]) for key in order)
 
 
 def file_ids(files):
-    return [f['id'] for f in files]
+    return [file['id'] for file in files]
 
 
-def delete_files(file_ids):
-    num_files = len(file_ids)
-    for index, file_id in enumerate(file_ids):
+def delete_files(ids):
+    num_files = len(ids)
+    for index, file_id in enumerate(ids):
         params = {
             'token': token,
             'file': file_id
@@ -87,9 +88,11 @@ def delete_files(file_ids):
         print((index + 1, "of", num_files, "-",
                file_id, json.load(response)['ok']))
 
-files = list_files()
-files_by_size = filter_by_size(files, size, delimiter)
-print(len(files_by_size))
-[info(file) for file in files_by_size]
-file_ids = file_ids(files_by_size)
-#delete_files(file_ids) # Commented out, so you don't accidentally run this.
+
+if __name__ == "__main__":
+    list_of_files = list_files()
+    files_by_size = filter_by_size(list_of_files, size, delimiter)
+    print(len(files_by_size))
+    [info(file) for file in files_by_size]
+    file_ids = file_ids(files_by_size)
+    # delete_files(file_ids) # Commented out, so you don't accidentally run this.
