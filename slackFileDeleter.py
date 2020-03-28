@@ -85,8 +85,7 @@ def delete_files(ids):
         }
         uri = 'https://slack.com/api/files.delete'
         response = reader(urlopen(uri + '?' + urlencode(params)))
-        print((index + 1, "of", num_files, "-",
-               file_id, json.load(response)['ok']))
+        print((index + 1, "of", num_files, "-", file_id, json.load(response)['ok']))
 
 
 if __name__ == "__main__":
